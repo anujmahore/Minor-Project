@@ -27,35 +27,93 @@ authentication, and payments.
   vector search integration.
 - GitHub Actions deployment workflow for the backend.
 
-## Architecture
+## System architecture
 
-```text
-React/Vite frontend
-        |
-        v
-API Gateway (auth, CORS, cookies, service proxy)
-        |
-        +--> Auth service ------> MongoDB / Redis / Firebase Admin
-        +--> Chat service ------> MongoDB
-        +--> Agent service -----> LLMs / Tavily / Qdrant / Supabase
-        +--> Billing service ---> MongoDB / Razorpay
-                                      |
-                                      +--> Redis
-```
+The following layered architecture represents the complete design of
+OrchestrAI, from user interaction to AI execution, storage, and quality
+validation:
 
-The gateway is the public backend entry point. Protected requests are
-authenticated at the gateway and forwarded to the appropriate internal
-service. The agent service uses a LangGraph workflow:
+![OrchestrAI system architecture](./docs/system-architecture.png)
 
-```text
-Request -> Supervisor -> Specialized agent -> Reviewer
-                         ^                    |
-                         +---- retry --------+
-```
+### Architectural layers
 
-PDF and image uploads are routed directly to their corresponding analysis
-workflow. Other requests are classified as chat, search, coding, PDF, PPT, or
-vision tasks.
+| Layer | Responsibility | Key technologies |
+|---|---|---|
+| Presentation Layer | Accepts prompts and file uploads, displays conversations, results, and generated artifacts | React, Vite, Redux Toolkit |
+| API Layer | Provides REST endpoints, authentication middleware, CORS, cookies, and service-to-service routing | Node.js, Express, Axios |
+| Orchestration Layer | Understands the user's intent and selects the most suitable specialized agent | LangGraph Supervisor |
+| Agent Layer | Executes domain-specific tasks such as chat, coding, search, PPT, PDF, image, and vision processing | LangChain, specialized agents |
+| Model / Tool Layer | Connects agents with language models, search, document generators, and image APIs | Groq, OpenRouter, Gemini, Tavily, PDFKit, PptxGenJS |
+| File Delivery Layer | Stores uploaded and generated files securely and provides controlled access | Supabase Storage, private buckets, signed URLs |
+| Platform Services | Supports identity, credits, sessions, persistence, payments, and caching | Firebase, Razorpay, MongoDB, Redis |
+| Quality Control Layer | Reviews generated output and either accepts it or sends it back for revision | Reviewer Agent |
+
+### Request processing workflow
+
+1. The user submits a prompt or uploads a PDF/image through the React
+   presentation layer.
+2. The API layer validates the session and forwards the request to the
+   appropriate backend service.
+3. The LangGraph supervisor classifies the request and routes it to exactly
+   one specialized agent.
+4. The selected agent executes the task using the required model, external
+   tool, database, or file-processing library.
+5. The reviewer agent evaluates the generated response or artifact.
+6. Approved output is returned to the frontend. If revision is required, the
+   workflow can retry within the configured limit.
+7. Generated files are delivered through controlled storage access rather than
+   exposing private storage credentials.
+
+This separation of concerns makes the system modular, scalable, and easier to
+test. New agents or tools can be added without redesigning the presentation
+layer, while the reviewer stage improves reliability over a single-model
+chatbot design.
+
+## Academic project overview
+
+### Problem statement
+
+Most AI applications provide one general-purpose chatbot, which can produce
+inconsistent results when a user asks for fundamentally different tasks such
+as coding, research, document generation, or image analysis. Users also need
+separate tools for authentication, file handling, conversation history, and
+payments.
+
+### Proposed solution
+
+OrchestrAI is a unified multi-agent platform that intelligently decomposes
+user requests and delegates them to purpose-built agents. It combines
+natural-language interaction with practical software engineering features:
+secure access control, persistent conversations, file-based workflows,
+retrieval support, generated artifacts, credits, and payment verification.
+
+### Objectives
+
+- Design a modular multi-agent architecture instead of a monolithic chatbot.
+- Automate task classification and agent selection using a supervisor agent.
+- Support both text-only and multimodal workflows.
+- Provide persistent, user-specific conversations and generated artifacts.
+- Add a reviewer stage for output validation and controlled retries.
+- Demonstrate integration of AI models, databases, storage, authentication,
+  payments, and deployable microservices in one academic system.
+
+### Innovation and significance
+
+The key contribution of this project is the combination of orchestration and
+quality control. The system does not simply call one model for every query:
+it selects a suitable capability, supplies the relevant tools, and evaluates
+the result before returning it. This improves extensibility, encourages
+separation of responsibilities, and demonstrates how modern AI systems can be
+engineered as dependable software products.
+
+### Expected outcomes
+
+- A single workspace for multiple academic and professional AI tasks.
+- Reduced manual effort in switching between specialized tools.
+- Reusable service boundaries for future agents and integrations.
+- Better traceability through stored conversations and generated artifacts.
+- A practical demonstration of full-stack development, distributed services,
+  AI orchestration, cloud integrations, and secure configuration management.
 
 ## Repository structure
 
@@ -71,6 +129,7 @@ vision tasks.
 │   ├── shared/redis/         # Shared Redis client
 │   └── docker-compose.yml    # Local Redis container
 ├── frontend/                 # React 19 + Vite client
+├── docs/                     # System architecture and project documentation assets
 ├── .github/workflows/        # Deployment automation
 └── .gitignore
 ```
