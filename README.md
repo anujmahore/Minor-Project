@@ -115,6 +115,113 @@ engineered as dependable software products.
 - A practical demonstration of full-stack development, distributed services,
   AI orchestration, cloud integrations, and secure configuration management.
 
+### Research alignment
+
+The design of OrchestrAI is informed by the progression of multi-agent
+research from tool-using reasoning to role-based collaboration and
+review-aware systems. The project translates these ideas into an integrated
+working application:
+
+| Research direction | Implementation in OrchestrAI |
+|---|---|
+| Tool-using reasoning | Agents invoke configured models, search, file processors, and generation tools |
+| Agent collaboration | A central supervisor coordinates independent specialist agents |
+| Role specialization | Chat, coding, search, PDF, PPT, and image-oriented workflows use task-specific behavior |
+| Review and evaluation | An independent reviewer returns a verdict and feedback |
+| Adaptive execution | Failed or incomplete outputs can be revised through bounded retries |
+| Provider flexibility | Groq, Google Gemini, and OpenRouter integrations reduce dependence on one provider |
+
+This makes the project more than a chatbot implementation: it is a practical
+study of how research concepts in LLM-based multi-agent systems can be
+combined with software engineering principles such as modularity, service
+boundaries, persistence, security, and observability.
+
+### Functional evaluation
+
+The project was evaluated through representative end-to-end demonstrations:
+
+- The Chat Agent generated a conversational response and received an
+  **APPROVED** reviewer verdict.
+- The Coding Agent generated a C++ array-reversal artifact and received an
+  **APPROVED** reviewer verdict without a retry.
+- The Search Agent returned the capital of India along with supporting visual
+  results.
+- The PDF Agent generated a Machine Learning guide and delivered it through a
+  time-limited Supabase signed download link.
+
+These demonstrations validate the complete path from request submission,
+supervisor routing, specialized execution, reviewer validation, and result or
+artifact delivery. They are functional demonstrations rather than claims of
+universal factual correctness or production-scale performance.
+
+## Conclusion
+
+OrchestrAI successfully demonstrates a unified, modular, and
+review-aware multi-agent AI platform. Instead of asking one general-purpose
+model to perform every task, the system uses a LangGraph supervisor to route
+requests to suitable specialist workflows and an independent reviewer to
+validate the generated response. This design addresses the core limitations of
+single-agent systems: low specialization, growing prompt complexity,
+uncontrolled tool usage, and the absence of systematic output checking.
+
+The implemented prototype integrates six primary task capabilities for chat,
+coding, search, PPT, PDF, and image-oriented tasks, together with supporting
+PDF retrieval and image-analysis workflows. It also brings together multiple
+LLM providers, authentication, credit management, payments, persistent
+conversations, cloud file storage, and microservice-based APIs. The recorded
+functional tests show that the system can route different requests, generate
+task-specific outputs, review them, and deliver both text and downloadable
+artifacts.
+
+From an academic perspective, the project demonstrates the complete
+engineering lifecycle of an AI system: literature-informed problem
+formulation, architecture design, implementation, integration, functional
+evaluation, limitation analysis, and a clearly defined path for future
+research. The result is a strong foundation for extending multi-agent
+applications beyond isolated demonstrations toward reliable and
+domain-oriented AI software.
+
+## Limitations
+
+- Output quality depends on the availability, capability, and rate limits of
+  external LLM and tool providers.
+- Reviewer approval improves consistency but cannot guarantee factual
+  correctness in every response.
+- Network failures, provider downtime, and API cost can affect execution.
+- Large-scale benchmarking, latency profiling, and load testing are not yet
+  complete.
+- Production-grade monitoring and advanced prompt-injection defenses require
+  further development.
+
+## Future scope
+
+The following extensions can evolve OrchestrAI from a functional prototype
+into a more autonomous, measurable, and production-ready platform:
+
+1. **Advanced agent intelligence**
+   Add long-term user memory, richer agent-to-agent collaboration, planning,
+   and context-aware task decomposition while preserving clear permissions
+   between agents.
+2. **Performance and cost optimization**
+   Measure routing accuracy, response latency, token usage, and provider cost;
+   then introduce model selection, caching, batching, streaming responses, and
+   workload-aware routing.
+3. **Reliability and security hardening**
+   Add structured error recovery, health checks, distributed tracing, audit
+   logs, stronger input validation, rate limiting, secret rotation, and
+   prompt-injection/tool-abuse protection.
+4. **Evaluation and benchmarking**
+   Build a reproducible benchmark covering task success, factuality,
+   relevance, reviewer agreement, retry rate, latency, and cost across
+   representative workloads.
+5. **Platform expansion**
+   Introduce Data Analysis, Spreadsheet, Email, research-assistant, and
+   database-query agents with permission-aware tool access.
+6. **Deployment maturity**
+   Add automated integration tests, container health checks, centralized
+   monitoring, autoscaling, and controlled CI/CD promotion across
+   development, staging, and production environments.
+
 ## Repository structure
 
 ```text
