@@ -1,491 +1,261 @@
 # OrchestrAI
 
-OrchestrAI is an intelligent multi-agent AI workspace. It provides a React
-frontend and a Node.js microservice backend for conversation, web search,
-coding assistance, document generation, image understanding, chat history,
-authentication, and payments.
+OrchestrAI is a multi-agent AI workspace developed as a Minor Project. It
+combines a React frontend with a Node.js microservice backend to provide chat,
+coding, search, document generation, image understanding, authentication,
+conversation history, file storage, and payments in one platform.
 
-## Features
+## Why OrchestrAI?
 
-- AI chat with Markdown and code rendering.
-- Automatic request routing through a supervisor agent.
-- Specialized agents for:
-  - General conversation and explanations.
-  - Web search and current information.
-  - Coding, debugging, architecture, and API design.
-  - PDF/document generation.
-  - PowerPoint presentation generation.
-  - Image generation and vision tasks.
-  - PDF question answering with retrieval-augmented generation.
-  - Image analysis.
-- Reviewer agent that checks generated responses and can request retries.
-- File uploads for PDF and image workflows.
-- Conversation creation, history, message persistence, and conversation updates.
-- Firebase-based authentication.
+A single general-purpose AI model is not equally effective for every task.
+OrchestrAI solves this problem through intelligent routing: a supervisor
+identifies the user's intent, delegates the task to a specialized agent, and a
+reviewer checks the result before delivery.
+
+## Key features
+
+- Supervisor-led routing with specialized agents for chat, coding, search,
+  PDF, PPT, vision, PDF retrieval, and image analysis.
+- Reviewer feedback with bounded retries.
+- Text and PDF/image upload workflows.
+- Persistent conversations and messages.
+- Firebase authentication and protected API access.
 - Credit plans and Razorpay payment verification.
-- MongoDB persistence, Redis connectivity, Supabase storage, and Qdrant
-  vector search integration.
-- GitHub Actions deployment workflow for the backend.
+- MongoDB, Redis, Qdrant, Supabase Storage, and multiple LLM providers.
+- Generated PDF/PPT artifacts and controlled download links.
 
 ## System architecture
 
-The following layered architecture represents the complete design of
-OrchestrAI, from user interaction to AI execution, storage, and quality
-validation:
-
 ![OrchestrAI system architecture](./docs/system-architecture.png)
 
-### Architectural layers
+| Layer | Responsibility |
+|---|---|
+| Presentation | React interface for prompts, uploads, conversations, and results |
+| API | Express gateway, authentication, cookies, CORS, and service routing |
+| Orchestration | LangGraph supervisor for intent classification and delegation |
+| Agents | Task-specific execution for chat, coding, search, PDF, PPT, and vision |
+| Models and tools | Groq, Gemini, OpenRouter, Tavily, PDFKit, PptxGenJS, and image APIs |
+| Platform services | Firebase, MongoDB, Redis, Razorpay, Qdrant, and Supabase |
+| Quality control | Reviewer verdict, feedback, and controlled retry |
 
-| Layer | Responsibility | Key technologies |
-|---|---|---|
-| Presentation Layer | Accepts prompts and file uploads, displays conversations, results, and generated artifacts | React, Vite, Redux Toolkit |
-| API Layer | Provides REST endpoints, authentication middleware, CORS, cookies, and service-to-service routing | Node.js, Express, Axios |
-| Orchestration Layer | Understands the user's intent and selects the most suitable specialized agent | LangGraph Supervisor |
-| Agent Layer | Executes domain-specific tasks such as chat, coding, search, PPT, PDF, image, and vision processing | LangChain, specialized agents |
-| Model / Tool Layer | Connects agents with language models, search, document generators, and image APIs | Groq, OpenRouter, Gemini, Tavily, PDFKit, PptxGenJS |
-| File Delivery Layer | Stores uploaded and generated files securely and provides controlled access | Supabase Storage, private buckets, signed URLs |
-| Platform Services | Supports identity, credits, sessions, persistence, payments, and caching | Firebase, Razorpay, MongoDB, Redis |
-| Quality Control Layer | Reviews generated output and either accepts it or sends it back for revision | Reviewer Agent |
+### Request flow
 
-### Request processing workflow
+```text
+User -> React frontend -> API Gateway -> Supervisor
+                                      -> Specialist Agent
+                                      -> Reviewer
+                                      -> Response or signed file link
+```
 
-1. The user submits a prompt or uploads a PDF/image through the React
-   presentation layer.
-2. The API layer validates the session and forwards the request to the
-   appropriate backend service.
-3. The LangGraph supervisor classifies the request and routes it to exactly
-   one specialized agent.
-4. The selected agent executes the task using the required model, external
-   tool, database, or file-processing library.
-5. The reviewer agent evaluates the generated response or artifact.
-6. Approved output is returned to the frontend. If revision is required, the
-   workflow can retry within the configured limit.
-7. Generated files are delivered through controlled storage access rather than
-   exposing private storage credentials.
-
-This separation of concerns makes the system modular, scalable, and easier to
-test. New agents or tools can be added without redesigning the presentation
-layer, while the reviewer stage improves reliability over a single-model
-chatbot design.
+1. The user submits a prompt or file.
+2. The gateway validates the request and user session.
+3. The supervisor selects one suitable agent.
+4. The agent executes the task using its model and tools.
+5. The reviewer approves the output or requests a bounded revision.
+6. The answer or generated artifact is returned to the frontend.
 
 ## Academic project overview
 
 ### Problem statement
 
-Most AI applications provide one general-purpose chatbot, which can produce
-inconsistent results when a user asks for fundamentally different tasks such
-as coding, research, document generation, or image analysis. Users also need
-separate tools for authentication, file handling, conversation history, and
-payments.
+General-purpose chatbot workflows become difficult to manage when they must
+support different tools, domains, file types, and quality requirements.
+Without specialization and review, outputs may be less reliable and the
+system becomes harder to extend.
 
 ### Proposed solution
 
-OrchestrAI is a unified multi-agent platform that intelligently decomposes
-user requests and delegates them to purpose-built agents. It combines
-natural-language interaction with practical software engineering features:
-secure access control, persistent conversations, file-based workflows,
-retrieval support, generated artifacts, credits, and payment verification.
+OrchestrAI implements a modular, supervisor-based multi-agent architecture.
+Each agent has a focused responsibility, while shared services manage
+identity, persistence, credits, storage, and payments.
 
 ### Objectives
 
-- Design a modular multi-agent architecture instead of a monolithic chatbot.
-- Automate task classification and agent selection using a supervisor agent.
-- Support both text-only and multimodal workflows.
-- Provide persistent, user-specific conversations and generated artifacts.
-- Add a reviewer stage for output validation and controlled retries.
-- Demonstrate integration of AI models, databases, storage, authentication,
-  payments, and deployable microservices in one academic system.
+- Automate task classification and intelligent agent selection.
+- Support both text and multimodal workflows.
+- Improve maintainability through independent services and agents.
+- Validate generated responses through a reviewer loop.
+- Demonstrate practical integration of AI, databases, storage, security, and
+  cloud deployment.
 
-### Innovation and significance
+### Innovation
 
-The key contribution of this project is the combination of orchestration and
-quality control. The system does not simply call one model for every query:
-it selects a suitable capability, supplies the relevant tools, and evaluates
-the result before returning it. This improves extensibility, encourages
-separation of responsibilities, and demonstrates how modern AI systems can be
-engineered as dependable software products.
-
-### Expected outcomes
-
-- A single workspace for multiple academic and professional AI tasks.
-- Reduced manual effort in switching between specialized tools.
-- Reusable service boundaries for future agents and integrations.
-- Better traceability through stored conversations and generated artifacts.
-- A practical demonstration of full-stack development, distributed services,
-  AI orchestration, cloud integrations, and secure configuration management.
-
-### Research alignment
-
-The design of OrchestrAI is informed by the progression of multi-agent
-research from tool-using reasoning to role-based collaboration and
-review-aware systems. The project translates these ideas into an integrated
-working application:
-
-| Research direction | Implementation in OrchestrAI |
-|---|---|
-| Tool-using reasoning | Agents invoke configured models, search, file processors, and generation tools |
-| Agent collaboration | A central supervisor coordinates independent specialist agents |
-| Role specialization | Chat, coding, search, PDF, PPT, and image-oriented workflows use task-specific behavior |
-| Review and evaluation | An independent reviewer returns a verdict and feedback |
-| Adaptive execution | Failed or incomplete outputs can be revised through bounded retries |
-| Provider flexibility | Groq, Google Gemini, and OpenRouter integrations reduce dependence on one provider |
-
-This makes the project more than a chatbot implementation: it is a practical
-study of how research concepts in LLM-based multi-agent systems can be
-combined with software engineering principles such as modularity, service
-boundaries, persistence, security, and observability.
+The project combines task specialization, provider flexibility, and output
+review in one working application. It applies ideas from tool-using agents,
+role-based collaboration, and multi-agent evaluation to a full-stack system
+rather than a standalone chatbot.
 
 ### Functional evaluation
 
-The project was evaluated through representative end-to-end demonstrations:
+Representative demonstrations in the project presentation showed:
 
-- The Chat Agent generated a conversational response and received an
-  **APPROVED** reviewer verdict.
-- The Coding Agent generated a C++ array-reversal artifact and received an
-  **APPROVED** reviewer verdict without a retry.
-- The Search Agent returned the capital of India along with supporting visual
-  results.
-- The PDF Agent generated a Machine Learning guide and delivered it through a
-  time-limited Supabase signed download link.
+- Chat Agent: conversational response with an approved review verdict.
+- Coding Agent: C++ array-reversal artifact with approved review.
+- Search Agent: answer with supporting search visuals.
+- PDF Agent: Machine Learning guide delivered through a signed download link.
 
-These demonstrations validate the complete path from request submission,
-supervisor routing, specialized execution, reviewer validation, and result or
-artifact delivery. They are functional demonstrations rather than claims of
-universal factual correctness or production-scale performance.
+These are functional demonstrations, not claims of universal factual
+correctness or production-scale performance.
 
 ## Conclusion
 
-OrchestrAI successfully demonstrates a unified, modular, and
-review-aware multi-agent AI platform. Instead of asking one general-purpose
-model to perform every task, the system uses a LangGraph supervisor to route
-requests to suitable specialist workflows and an independent reviewer to
-validate the generated response. This design addresses the core limitations of
-single-agent systems: low specialization, growing prompt complexity,
-uncontrolled tool usage, and the absence of systematic output checking.
+OrchestrAI demonstrates a unified and modular AI platform that routes diverse
+requests to suitable specialist agents and validates their outputs. The
+prototype integrates six primary task capabilities, additional PDF/image
+workflows, multiple LLM providers, authentication, billing, persistence,
+cloud storage, and microservice APIs.
 
-The implemented prototype integrates six primary task capabilities for chat,
-coding, search, PPT, PDF, and image-oriented tasks, together with supporting
-PDF retrieval and image-analysis workflows. It also brings together multiple
-LLM providers, authentication, credit management, payments, persistent
-conversations, cloud file storage, and microservice-based APIs. The recorded
-functional tests show that the system can route different requests, generate
-task-specific outputs, review them, and deliver both text and downloadable
-artifacts.
-
-From an academic perspective, the project demonstrates the complete
-engineering lifecycle of an AI system: literature-informed problem
-formulation, architecture design, implementation, integration, functional
-evaluation, limitation analysis, and a clearly defined path for future
-research. The result is a strong foundation for extending multi-agent
-applications beyond isolated demonstrations toward reliable and
-domain-oriented AI software.
+The project covers the complete engineering cycle: literature-informed
+problem formulation, architecture design, implementation, integration, and
+functional evaluation. It provides a strong foundation for developing more
+reliable, domain-oriented, and scalable multi-agent applications.
 
 ## Limitations
 
-- Output quality depends on the availability, capability, and rate limits of
-  external LLM and tool providers.
-- Reviewer approval improves consistency but cannot guarantee factual
-  correctness in every response.
-- Network failures, provider downtime, and API cost can affect execution.
-- Large-scale benchmarking, latency profiling, and load testing are not yet
-  complete.
-- Production-grade monitoring and advanced prompt-injection defenses require
-  further development.
+- Output quality depends on external model and tool providers.
+- Reviewer approval does not guarantee factual correctness.
+- Provider rate limits, cost, downtime, and network failures can affect
+  execution.
+- Large-scale benchmarking, load testing, monitoring, and advanced
+  prompt-injection protection need further work.
 
 ## Future scope
 
-The following extensions can evolve OrchestrAI from a functional prototype
-into a more autonomous, measurable, and production-ready platform:
+1. Add long-term memory, planning, and richer agent-to-agent collaboration.
+2. Improve routing accuracy, latency, token usage, caching, streaming, and
+   provider cost efficiency.
+3. Add structured recovery, tracing, audit logs, rate limiting, and stronger
+   prompt-injection protection.
+4. Create benchmarks for task success, factuality, relevance, latency, cost,
+   reviewer agreement, and retry rate.
+5. Add Data Analysis, Spreadsheet, Email, research, and database agents.
+6. Introduce integration testing, health checks, monitoring, autoscaling, and
+   staged CI/CD deployment.
 
-1. **Advanced agent intelligence**
-   Add long-term user memory, richer agent-to-agent collaboration, planning,
-   and context-aware task decomposition while preserving clear permissions
-   between agents.
-2. **Performance and cost optimization**
-   Measure routing accuracy, response latency, token usage, and provider cost;
-   then introduce model selection, caching, batching, streaming responses, and
-   workload-aware routing.
-3. **Reliability and security hardening**
-   Add structured error recovery, health checks, distributed tracing, audit
-   logs, stronger input validation, rate limiting, secret rotation, and
-   prompt-injection/tool-abuse protection.
-4. **Evaluation and benchmarking**
-   Build a reproducible benchmark covering task success, factuality,
-   relevance, reviewer agreement, retry rate, latency, and cost across
-   representative workloads.
-5. **Platform expansion**
-   Introduce Data Analysis, Spreadsheet, Email, research-assistant, and
-   database-query agents with permission-aware tool access.
-6. **Deployment maturity**
-   Add automated integration tests, container health checks, centralized
-   monitoring, autoscaling, and controlled CI/CD promotion across
-   development, staging, and production environments.
-
-## Repository structure
+## Project structure
 
 ```text
 .
+├── frontend/                 # React and Vite client
 ├── backend/
-│   ├── gateway/              # Public API gateway and authentication proxy
+│   ├── gateway/              # Public API gateway
 │   ├── services/
 │   │   ├── agent/            # LangGraph workflow and AI agents
-│   │   ├── auth/             # Login, logout, credits, and user plans
-│   │   ├── billing/          # Razorpay order creation and verification
-│   │   └── chat/             # Conversations and message persistence
+│   │   ├── auth/             # Authentication and credits
+│   │   ├── billing/          # Razorpay integration
+│   │   └── chat/             # Conversations and messages
 │   ├── shared/redis/         # Shared Redis client
-│   └── docker-compose.yml    # Local Redis container
-├── frontend/                 # React 19 + Vite client
-├── docs/                     # System architecture and project documentation assets
-├── .github/workflows/        # Deployment automation
-└── .gitignore
+│   └── docker-compose.yml    # Local Redis
+├── docs/system-architecture.png
+└── .github/workflows/        # AWS deployment workflow
 ```
 
 ## Technology stack
 
-### Frontend
+**Frontend:** React 19, Vite, Redux Toolkit, Tailwind CSS, Axios, Firebase,
+Monaco Editor, React Markdown.
 
-- React 19
-- Vite
-- Redux Toolkit
-- Tailwind CSS
-- Axios
-- Firebase client SDK
-- Monaco Editor
-- React Markdown and syntax highlighting
-
-### Backend
-
-- Node.js with ES modules
-- Express
-- MongoDB with Mongoose
-- Redis with ioredis
-- LangChain and LangGraph
-- Groq and Google Gemini models
-- Tavily search
-- Qdrant vector database
-- Supabase Storage
-- Firebase Admin
-- Razorpay
-- Multer, PDFKit, PDF parsing, and PptxGenJS
+**Backend:** Node.js, Express, MongoDB/Mongoose, Redis, LangChain, LangGraph,
+Groq, Google Gemini, OpenRouter, Tavily, Qdrant, Supabase, Firebase Admin,
+Razorpay, Multer, PDFKit, PDF parsing, and PptxGenJS.
 
 ## API routes
 
-All routes below are exposed through the gateway. The gateway prefixes each
-service with `/api`.
+All service routes are accessed through the gateway.
 
-| Area | Method | Endpoint | Purpose |
-|---|---:|---|---|
-| Gateway | GET | `/` | Gateway health response |
-| Auth | POST | `/api/auth/login` | Create or authenticate a user |
-| Auth | GET | `/api/auth/logout` | Log out the current user |
-| Auth | POST | `/api/auth/update-plan` | Update the user's plan and credits |
-| Auth | POST | `/api/auth/deduct-credits` | Deduct credits for an agent action |
-| User | GET | `/api/me` | Get the authenticated user |
-| Chat | GET | `/api/chat/create-conversation` | Create a conversation |
-| Chat | GET | `/api/chat/get-conversations` | List conversations |
-| Chat | POST | `/api/chat/update-conversation` | Update conversation details |
-| Chat | POST | `/api/chat/save-message` | Save a message |
-| Chat | GET | `/api/chat/get-messages/:conversationId` | Get conversation messages |
-| Agent | POST | `/api/agent/chat` | Send a prompt and optional file |
-| Billing | POST | `/api/billing/create` | Create a Razorpay order |
-| Billing | POST | `/api/billing/verify` | Verify a Razorpay payment |
+| Area | Method | Endpoint |
+|---|---:|---|
+| Gateway | GET | `/` |
+| Auth | POST | `/api/auth/login` |
+| Auth | GET | `/api/auth/logout` |
+| Auth | POST | `/api/auth/update-plan` |
+| Auth | POST | `/api/auth/deduct-credits` |
+| User | GET | `/api/me` |
+| Chat | GET | `/api/chat/create-conversation` |
+| Chat | GET | `/api/chat/get-conversations` |
+| Chat | POST | `/api/chat/update-conversation` |
+| Chat | POST | `/api/chat/save-message` |
+| Chat | GET | `/api/chat/get-messages/:conversationId` |
+| Agent | POST | `/api/agent/chat` |
+| Billing | POST | `/api/billing/create` |
+| Billing | POST | `/api/billing/verify` |
 
-Protected routes require the authentication cookie and are handled by the
-gateway middleware.
+Protected routes require the authentication cookie.
 
-## Requirements
+## Setup
 
-- Node.js 18+ recommended.
-- npm.
-- MongoDB.
-- Redis.
-- Firebase project and Admin SDK service account.
-- API credentials for the providers used by your chosen workflows.
+### Requirements
 
-## Installation
+- Node.js 18+ and npm
+- MongoDB and Redis
+- Firebase project and Admin SDK service account
+- API credentials for the providers you want to use
 
-Clone the repository and install dependencies for each workspace:
+### Install
 
 ```bash
 git clone https://github.com/anujmahore/Minor-Project.git
 cd Minor-Project
 
-cd frontend
-npm install
-
-cd ../backend/gateway
-npm install
-
-cd ../services/agent
-npm install
-
-cd ../auth
-npm install
-
-cd ../billing
-npm install
-
-cd ../chat
-npm install
+cd frontend && npm install
+cd ../backend/gateway && npm install
+cd ../services/agent && npm install
+cd ../auth && npm install
+cd ../billing && npm install
+cd ../chat && npm install
 ```
 
-Start Redis locally with Docker:
+Start Redis:
 
 ```bash
 cd backend
 docker compose up -d redis
 ```
 
-## Environment variables
+### Environment files
 
-Environment files are intentionally ignored by Git. Create the following
-files locally and fill them with your own credentials.
+Create these local files. Never commit them.
 
-### `backend/gateway/.env`
+| File | Required variables |
+|---|---|
+| `backend/gateway/.env` | `PORT`, `FRONTEND_URL`, `AUTH_SERVICE`, `CHAT_SERVICE`, `AGENT_SERVICE`, `BILLING_SERVICE`, `REDIS_URL` |
+| `backend/services/auth/.env` | `PORT`, `MONGODB_URI`, `REDIS_URL` |
+| `backend/services/chat/.env` | `PORT`, `MONGODB_URI` |
+| `backend/services/agent/.env` | `PORT`, `MONGODB_URI`, `REDIS_URL`, `AUTH_SERVICE`, `CHAT_SERVICE`, `GROQ_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`, `TAVILY_API_KEY`, `QDRANT_URL`, `QDRANT_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_BUCKET_NAME`, `MAX_REVIEW_RETRIES` |
+| `backend/services/billing/.env` | `PORT`, `MONGODB_URI`, `AUTH_SERVICE`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` |
+| `frontend/.env` | `VITE_SERVER_URL`, `VITE_FIREBASE_API_KEY`, `VITE_RAZORPAY_KEY_ID` |
 
-```env
-PORT=4000
-FRONTEND_URL=http://localhost:5173
-AUTH_SERVICE=http://localhost:4001
-CHAT_SERVICE=http://localhost:4002
-AGENT_SERVICE=http://localhost:4003
-BILLING_SERVICE=http://localhost:4004
-REDIS_URL=redis://localhost:6379
-```
+The auth service also requires the local Firebase Admin file:
+`backend/services/auth/serviceAccountKey.json`.
 
-### `backend/services/auth/.env`
+### Run locally
 
-```env
-PORT=4001
-MONGODB_URI=
-REDIS_URL=redis://localhost:6379
-```
-
-### `backend/services/chat/.env`
-
-```env
-PORT=4002
-MONGODB_URI=
-```
-
-### `backend/services/agent/.env`
-
-```env
-PORT=4003
-MONGODB_URI=
-REDIS_URL=redis://localhost:6379
-AUTH_SERVICE=http://localhost:4001
-CHAT_SERVICE=http://localhost:4002
-GROQ_API_KEY=
-GOOGLE_API_KEY=
-OPENROUTER_API_KEY=
-TAVILY_API_KEY=
-QDRANT_URL=
-QDRANT_API_KEY=
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
-SUPABASE_BUCKET_NAME=
-MAX_REVIEW_RETRIES=2
-```
-
-### `backend/services/billing/.env`
-
-```env
-PORT=4004
-MONGODB_URI=
-AUTH_SERVICE=http://localhost:4001
-RAZORPAY_KEY_ID=
-RAZORPAY_KEY_SECRET=
-```
-
-### `frontend/.env`
-
-```env
-VITE_SERVER_URL=http://localhost:4000
-VITE_FIREBASE_API_KEY=
-VITE_RAZORPAY_KEY_ID=
-```
-
-The auth service also expects
-`backend/services/auth/serviceAccountKey.json` for Firebase Admin. This file
-must remain local and must never be committed.
-
-## Running locally
-
-Run each service in a separate terminal:
+Run each command in a separate terminal:
 
 ```bash
-# Terminal 1
-cd backend/gateway
-npm run dev
-
-# Terminal 2
-cd backend/services/auth
-npm run dev
-
-# Terminal 3
-cd backend/services/chat
-npm run dev
-
-# Terminal 4
-cd backend/services/agent
-npm run dev
-
-# Terminal 5
-cd backend/services/billing
-npm run dev
-
-# Terminal 6
-cd frontend
-npm run dev
+cd backend/gateway && npm run dev
+cd backend/services/auth && npm run dev
+cd backend/services/chat && npm run dev
+cd backend/services/agent && npm run dev
+cd backend/services/billing && npm run dev
+cd frontend && npm run dev
 ```
 
-The frontend is served by Vite, normally at `http://localhost:5173`. The
-gateway is the frontend's backend URL and normally runs at
-`http://localhost:4000` when using the example configuration.
+The default frontend URL is `http://localhost:5173` and the gateway URL is
+`http://localhost:4000`.
 
-## Frontend commands
+## Useful commands
 
 ```bash
-npm run dev       # Start the Vite development server
-npm run build     # Create a production build
-npm run preview   # Preview the production build
-npm run lint      # Run ESLint
+npm run dev       # Development server
+npm start         # Backend production start
+npm run build     # Frontend production build
+npm run lint      # Frontend linting
 ```
 
-## Backend commands
+## Security
 
-Each backend service supports:
-
-```bash
-npm run dev       # Start with Nodemon
-npm start         # Start with Node.js
-```
-
-## Security notes
-
-- Never commit `.env` files, Firebase service account JSON, API keys, payment
-  secrets, or uploaded user files.
-- Use separate development and production credentials.
-- Configure GitHub Actions secrets for deployment instead of putting cloud
-  credentials in workflow source.
-- Rotate any credential immediately if it is accidentally exposed.
-
-## Deployment
-
-The workflow in `.github/workflows/deploy.yml` runs on pushes to `main` and
-contains the backend deployment automation. Configure all referenced AWS
-secrets in the repository's GitHub Actions settings before enabling a
-production deployment. Provider credentials and runtime environment variables
-must be supplied through the deployment platform's secret management.
-
-## Current status
-
-This project is under active development. Service-level automated tests are
-not currently configured; use the frontend lint/build commands and verify the
-gateway and service health responses when validating a local setup.
-
-## License
-
-No project license has been specified yet.
+- Keep `.env`, Firebase service account files, API keys, payment secrets, and
+  uploaded user files out of Git.
+- Use GitHub Actions secrets for AWS credentials and deployment configuration.
+- Rotate credentials immediately if they are exposed.
