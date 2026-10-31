@@ -5,14 +5,14 @@ combines a React frontend with a Node.js microservice backend to provide chat,
 coding, search, document generation, image understanding, authentication,
 conversation history, file storage, and payments in one platform.
 
-## Why OrchestrAI?
+## 1. Why OrchestrAI?
 
 A single general-purpose AI model is not equally effective for every task.
 OrchestrAI solves this problem through intelligent routing: a supervisor
 identifies the user's intent, delegates the task to a specialized agent, and a
 reviewer checks the result before delivery.
 
-## Key features
+## 2. Key features
 
 - Supervisor-led routing with specialized agents for chat, coding, search,
   PDF, PPT, vision, PDF retrieval, and image analysis.
@@ -24,7 +24,7 @@ reviewer checks the result before delivery.
 - MongoDB, Redis, Qdrant, Supabase Storage, and multiple LLM providers.
 - Generated PDF/PPT artifacts and controlled download links.
 
-## System architecture
+## 3. System architecture
 
 ![OrchestrAI system architecture](./docs/system-architecture.png)
 
@@ -54,7 +54,7 @@ User -> React frontend -> API Gateway -> Supervisor
 5. The reviewer approves the output or requests a bounded revision.
 6. The answer or generated artifact is returned to the frontend.
 
-## Academic project overview
+## 4. Academic project overview
 
 ### Problem statement
 
@@ -97,7 +97,7 @@ Representative demonstrations in the project presentation showed:
 These are functional demonstrations, not claims of universal factual
 correctness or production-scale performance.
 
-## Conclusion
+## 5. Conclusion
 
 OrchestrAI demonstrates a unified and modular AI platform that routes diverse
 requests to suitable specialist agents and validates their outputs. The
@@ -110,7 +110,7 @@ problem formulation, architecture design, implementation, integration, and
 functional evaluation. It provides a strong foundation for developing more
 reliable, domain-oriented, and scalable multi-agent applications.
 
-## Limitations
+## 6. Limitations
 
 - Output quality depends on external model and tool providers.
 - Reviewer approval does not guarantee factual correctness.
@@ -119,7 +119,7 @@ reliable, domain-oriented, and scalable multi-agent applications.
 - Large-scale benchmarking, load testing, monitoring, and advanced
   prompt-injection protection need further work.
 
-## Future scope
+## 7. Future scope
 
 1. Add long-term memory, planning, and richer agent-to-agent collaboration.
 2. Improve routing accuracy, latency, token usage, caching, streaming, and
@@ -132,7 +132,7 @@ reliable, domain-oriented, and scalable multi-agent applications.
 6. Introduce integration testing, health checks, monitoring, autoscaling, and
    staged CI/CD deployment.
 
-## Project structure
+## 8. Project structure
 
 ```text
 .
@@ -150,7 +150,7 @@ reliable, domain-oriented, and scalable multi-agent applications.
 └── .github/workflows/        # AWS deployment workflow
 ```
 
-## Technology stack
+## 9. Technology stack
 
 **Frontend:** React 19, Vite, Redux Toolkit, Tailwind CSS, Axios, Firebase,
 Monaco Editor, React Markdown.
@@ -159,7 +159,7 @@ Monaco Editor, React Markdown.
 Groq, Google Gemini, OpenRouter, Tavily, Qdrant, Supabase, Firebase Admin,
 Razorpay, Multer, PDFKit, PDF parsing, and PptxGenJS.
 
-## API routes
+## 10. API routes
 
 All service routes are accessed through the gateway.
 
@@ -182,7 +182,7 @@ All service routes are accessed through the gateway.
 
 Protected routes require the authentication cookie.
 
-## Setup
+## 11. Setup
 
 ### Requirements
 
@@ -244,7 +244,7 @@ cd frontend && npm run dev
 The default frontend URL is `http://localhost:5173` and the gateway URL is
 `http://localhost:4000`.
 
-## Useful commands
+## 12. Useful commands
 
 ```bash
 npm run dev       # Development server
@@ -253,7 +253,7 @@ npm run build     # Frontend production build
 npm run lint      # Frontend linting
 ```
 
-## Security
+## 13. Security
 
 - Keep `.env`, Firebase service account files, API keys, payment secrets, and
   uploaded user files out of Git.
