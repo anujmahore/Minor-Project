@@ -147,7 +147,7 @@ reliable, domain-oriented, and scalable multi-agent applications.
 │   ├── shared/redis/         # Shared Redis client
 │   └── docker-compose.yml    # Local Redis
 ├── docs/system-architecture.png
-└── .github/workflows/        # AWS deployment workflow
+└── README.md
 ```
 
 ## 9. Technology stack
@@ -257,5 +257,4 @@ npm run lint      # Frontend linting
 
 - Keep `.env`, Firebase service account files, API keys, payment secrets, and
   uploaded user files out of Git.
-- Use GitHub Actions secrets for AWS credentials and deployment configuration.
 - Rotate credentials immediately if they are exposed.
